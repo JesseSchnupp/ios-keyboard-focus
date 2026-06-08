@@ -3,11 +3,8 @@
 import { useEffect, useRef, useState, type RefObject } from "react"
 import { flushSync } from "react-dom"
 import {
-  focusInput,
-  focusWithIosKeyboard,
-  useIosInputFocus,
-  useVisualViewport,
-  useVisualViewportScrollLock,
+  KeyboardModalShell,
+  refocusInputInModal,
 } from "@/lib/ios-keyboard-focus"
 import type { MockItemInput } from "@/lib/mock-items-store"
 
@@ -41,26 +38,13 @@ export const AddItemModal = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const userScrolledRef = useRef(false)
 
-  useVisualViewport()
-  useVisualViewportScrollLock(isOpen)
-  useIosInputFocus({
-    inputRef: nameInputRef,
-    enabled: isOpen,
-  })
-
   useEffect(() => {
     if (!isOpen) {
       userScrolledRef.current = false
       return
     }
 
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = "hidden"
     scrollContainerRef.current?.scrollTo({ top: 0 })
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-    }
   }, [isOpen])
 
   const handleInputFocus = () => {
@@ -126,12 +110,7 @@ export const AddItemModal = ({
 
     userScrolledRef.current = false
     scrollContainerRef.current?.scrollTo({ top: 0 })
-
-    const didFocus = focusInput(nameInputRef, { selectOnFocus: true })
-
-    if (!didFocus) {
-      focusWithIosKeyboard(nameInputRef, { selectOnFocus: true })
-    }
+    refocusInputInModal(nameInputRef, { selectOnFocus: true })
   }
 
   const handleNameChange = (value: string) => {
@@ -141,23 +120,11 @@ export const AddItemModal = ({
     }
   }
 
-  if (!isOpen) {
-    return null
-  }
-
   return (
-    <div
-      className="z-50 flex touch-manipulation flex-col overscroll-contain bg-background"
-      style={{
-        position: "fixed",
-        top: "var(--visual-viewport-offset-top, 0px)",
-        left: "var(--visual-viewport-offset-left, 0px)",
-        width: "var(--visual-viewport-width, 100%)",
-        height: "var(--visual-viewport-height, 100dvh)",
-      }}
-      role="dialog"
-      aria-modal="true"
+    <KeyboardModalShell
+      isOpen={isOpen}
       aria-labelledby="add-item-modal-title"
+      className="z-50 flex flex-col bg-background"
     >
       <header className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
         <h2
@@ -278,6 +245,6 @@ export const AddItemModal = ({
           </button>
         </div>
       </footer>
-    </div>
+    </KeyboardModalShell>
   )
 }

@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# iOS Keyboard Focus
 
-## Getting Started
+Demo app and npm package for reliable mobile keyboard focus on iOS Safari and Android.
 
-First, run the development server:
+**Live demo:** [ios-keyboard-focus.vercel.app](https://ios-keyboard-focus.vercel.app)
+
+## Package
+
+The reusable library lives at [`packages/ios-keyboard-focus`](packages/ios-keyboard-focus).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install @jesse-schnupp/ios-keyboard-focus
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Documentation:** [packages/ios-keyboard-focus/README.md](packages/ios-keyboard-focus/README.md)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Quick usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```tsx
+import { useRef, useState } from "react"
+import {
+  KeyboardModalShell,
+  openModalWithInputFocus,
+} from "@jesse-schnupp/ios-keyboard-focus"
 
-## Learn More
+const nameInputRef = useRef<HTMLInputElement>(null)
+const [isOpen, setIsOpen] = useState(false)
 
-To learn more about Next.js, take a look at the following resources:
+const handleOpen = () => {
+  openModalWithInputFocus(() => setIsOpen(true), nameInputRef)
+}
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+return (
+  <>
+    <button type="button" onClick={handleOpen}>Add Item</button>
+    <KeyboardModalShell isOpen={isOpen} className="z-50 flex flex-col bg-white">
+      <input ref={nameInputRef} type="text" className="text-base" />
+    </KeyboardModalShell>
+  </>
+)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development
 
-## Deploy on Vercel
+```bash
+npm install
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Build demo + package:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+```
+
+## Project structure
+
+```text
+packages/ios-keyboard-focus/   # Publishable npm package
+src/
+  app/                         # Next.js demo
+  components/                  # Demo UI
+  lib/ios-keyboard-focus/      # Re-exports package for demo aliases
+```
+
+## License
+
+MIT

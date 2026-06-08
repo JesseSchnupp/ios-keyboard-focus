@@ -2,13 +2,18 @@
   "name": "ios-keyboard-focus",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:package && next build",
+    "build:package": "npm run build -w @jesse-schnupp/ios-keyboard-focus",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@jesse-schnupp/ios-keyboard-focus": "workspace:*",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"

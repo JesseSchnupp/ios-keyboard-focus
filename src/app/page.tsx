@@ -3,9 +3,8 @@
 import { useRef, useState } from "react"
 import { AddItemModal } from "@/components/add-item-modal"
 import { ItemList } from "@/components/item-list"
-import { focusInput, focusWithIosKeyboard } from "@/lib/ios-keyboard-focus"
+import { openModalWithInputFocus } from "@/lib/ios-keyboard-focus"
 import { createMockItem, type MockItem } from "@/lib/mock-items-store"
-import { flushSync } from "react-dom"
 
 export default function Home() {
   const [items, setItems] = useState<MockItem[]>([])
@@ -13,15 +12,9 @@ export default function Home() {
   const nameInputRef = useRef<HTMLInputElement>(null)
 
   const handleOpenModal = () => {
-    flushSync(() => {
-      setIsModalOpen(true)
+    openModalWithInputFocus(() => setIsModalOpen(true), nameInputRef, {
+      selectOnFocus: true,
     })
-
-    const didFocus = focusInput(nameInputRef, { selectOnFocus: true })
-
-    if (!didFocus) {
-      focusWithIosKeyboard(nameInputRef, { selectOnFocus: true })
-    }
   }
 
   const handleCloseModal = () => {
