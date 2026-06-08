@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState, type RefObject } from "react"
+import { useEffect, useRef, useState, type RefObject } from "react"
 import { flushSync } from "react-dom"
 import {
   focusInput,
   focusWithIosKeyboard,
   useIosInputFocus,
-  useVisualViewportHeight,
+  useVisualViewport,
+  useVisualViewportScrollLock,
 } from "@/lib/ios-keyboard-focus"
 import type { MockItemInput } from "@/lib/mock-items-store"
 
@@ -37,8 +38,11 @@ export const AddItemModal = ({
 }: AddItemModalProps) => {
   const [formState, setFormState] = useState<FormState>(emptyFormState)
   const [error, setError] = useState<string | null>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const userScrolledRef = useRef(false)
 
-  useVisualViewportHeight()
+  useVisualViewport()
+  useVisualViewportScrollLock(isOpen)
   useIosInputFocus({
     inputRef: nameInputRef,
     enabled: isOpen,
@@ -46,16 +50,36 @@ export const AddItemModal = ({
 
   useEffect(() => {
     if (!isOpen) {
+      userScrolledRef.current = false
       return
     }
 
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = "hidden"
+    scrollContainerRef.current?.scrollTo({ top: 0 })
 
     return () => {
       document.body.style.overflow = previousOverflow
     }
   }, [isOpen])
+
+  const handleInputFocus = () => {
+    if (userScrolledRef.current) {
+      return
+    }
+
+    const scrollContainer = scrollContainerRef.current
+
+    if (!scrollContainer || scrollContainer.scrollTop === 0) {
+      return
+    }
+
+    scrollContainer.scrollTop = 0
+  }
+
+  const handleScrollContainerScroll = () => {
+    userScrolledRef.current = true
+  }
 
   const clearForm = () => {
     setFormState(emptyFormState())
@@ -100,6 +124,9 @@ export const AddItemModal = ({
       clearForm()
     })
 
+    userScrolledRef.current = false
+    scrollContainerRef.current?.scrollTo({ top: 0 })
+
     const didFocus = focusInput(nameInputRef, { selectOnFocus: true })
 
     if (!didFocus) {
@@ -120,8 +147,14 @@ export const AddItemModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-background"
-      style={{ height: "var(--visual-viewport-height, 100dvh)" }}
+      className="z-50 flex touch-manipulation flex-col overscroll-contain bg-background"
+      style={{
+        position: "fixed",
+        top: "var(--visual-viewport-offset-top, 0px)",
+        left: "var(--visual-viewport-offset-left, 0px)",
+        width: "var(--visual-viewport-width, 100%)",
+        height: "var(--visual-viewport-height, 100dvh)",
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="add-item-modal-title"
@@ -144,7 +177,9 @@ export const AddItemModal = ({
       </header>
 
       <div
+        ref={scrollContainerRef}
         data-modal-scroll
+        onScroll={handleScrollContainerScroll}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4 py-4"
       >
         <form
@@ -164,6 +199,7 @@ export const AddItemModal = ({
               inputMode="text"
               value={formState.name}
               onChange={(event) => handleNameChange(event.target.value)}
+              onFocus={handleInputFocus}
               autoComplete="off"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
               aria-label="Item name"
@@ -185,6 +221,7 @@ export const AddItemModal = ({
                   email: event.target.value,
                 }))
               }
+              onFocus={handleInputFocus}
               autoComplete="email"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
               aria-label="Item email"
@@ -206,6 +243,7 @@ export const AddItemModal = ({
                   quantity: event.target.value,
                 }))
               }
+              onFocus={handleInputFocus}
               autoComplete="off"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
               aria-label="Item quantity"
