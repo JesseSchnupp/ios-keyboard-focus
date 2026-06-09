@@ -9,7 +9,7 @@ Demo app and npm package for reliable mobile keyboard focus on iOS Safari and An
 The reusable library lives at [`packages/ios-keyboard-focus`](packages/ios-keyboard-focus).
 
 ```bash
-npm install @jesse-schnupp/ios-keyboard-focus
+npm install @nullcheck/ios-keyboard-focus
 ```
 
 **Documentation:** [packages/ios-keyboard-focus/README.md](packages/ios-keyboard-focus/README.md)
@@ -21,7 +21,7 @@ import { useRef, useState } from "react"
 import {
   KeyboardModalShell,
   openModalWithInputFocus,
-} from "@jesse-schnupp/ios-keyboard-focus"
+} from "@nullcheck/ios-keyboard-focus"
 
 const nameInputRef = useRef<HTMLInputElement>(null)
 const [isOpen, setIsOpen] = useState(false)

@@ -30,10 +30,19 @@ const getVisualViewportMetrics = (
   offsetLeft: visualViewport.offsetLeft,
 })
 
-export const useVisualViewport = () => {
+type UseVisualViewportOptions = {
+  enabled?: boolean
+}
+
+export const useVisualViewport = (options: UseVisualViewportOptions = {}) => {
+  const { enabled = true } = options
   const [metrics, setMetrics] = useState<VisualViewportMetrics | null>(null)
 
   useEffect(() => {
+    if (!enabled) {
+      return
+    }
+
     const visualViewport = window.visualViewport
 
     if (!visualViewport) {
@@ -54,7 +63,7 @@ export const useVisualViewport = () => {
       visualViewport.removeEventListener("resize", updateMetrics)
       visualViewport.removeEventListener("scroll", updateMetrics)
     }
-  }, [])
+  }, [enabled])
 
   return metrics
 }

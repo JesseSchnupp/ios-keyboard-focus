@@ -1,11 +1,20 @@
 "use client"
 
 import { useEffect } from "react"
+import type { KeyboardModalViewportMode } from "./keyboard-modal-styles"
 import { useVisualViewport } from "./use-visual-viewport"
 import { useVisualViewportScrollLock } from "./use-visual-viewport-scroll-lock"
 
-export const useKeyboardModal = (isOpen: boolean) => {
-  const metrics = useVisualViewport()
+type UseKeyboardModalOptions = {
+  viewportMode?: KeyboardModalViewportMode
+}
+
+export const useKeyboardModal = (
+  isOpen: boolean,
+  options: UseKeyboardModalOptions = {}
+) => {
+  const { viewportMode = "fit" } = options
+  const metrics = useVisualViewport({ enabled: viewportMode === "fit" })
 
   useVisualViewportScrollLock(isOpen)
 

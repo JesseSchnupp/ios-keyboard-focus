@@ -1,4 +1,4 @@
-# @jesse-schnupp/ios-keyboard-focus
+# @nullcheck/ios-keyboard-focus
 
 Reliable mobile keyboard focus for **iOS Safari** and **Android** when opening modals with inputs in React.
 
@@ -16,7 +16,7 @@ Live demo: [ios-keyboard-focus.vercel.app](https://ios-keyboard-focus.vercel.app
 ## Install
 
 ```bash
-npm install @jesse-schnupp/ios-keyboard-focus
+npm install @nullcheck/ios-keyboard-focus
 ```
 
 **Peer dependencies:** `react` and `react-dom` (v18+)
@@ -36,7 +36,7 @@ npm run build
 npm link
 
 cd your-other-project
-npm link @jesse-schnupp/ios-keyboard-focus
+npm link @nullcheck/ios-keyboard-focus
 ```
 
 ---
@@ -73,7 +73,7 @@ export const viewport = {
 "use client"
 
 import { useRef, useState } from "react"
-import { openModalWithInputFocus } from "@jesse-schnupp/ios-keyboard-focus"
+import { openModalWithInputFocus } from "@nullcheck/ios-keyboard-focus"
 
 export const AddItemButton = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -98,12 +98,22 @@ export const AddItemButton = () => {
 
 ### 3. Wrap your modal with `KeyboardModalShell`
 
+Choose a **viewport mode** based on your form layout:
+
+| `viewportMode` | Footer when keyboard opens | Best for |
+|----------------|----------------------------|----------|
+| `"fit"` (default) | Stays visible above keyboard | Simple forms where actions must stay reachable |
+| `"overlay"` | Stays at screen bottom, covered by keyboard | Forms with custom dropdowns/selectors near inputs |
+
+Use `"overlay"` when a fixed footer jumping above the keyboard blocks popovers or custom pickers. Footer actions may require dismissing the keyboard first.
+
 ```tsx
-import { KeyboardModalShell } from "@jesse-schnupp/ios-keyboard-focus"
+import { KeyboardModalShell } from "@nullcheck/ios-keyboard-focus"
 
 export const YourModal = ({ nameInputRef, isOpen, onClose }) => (
   <KeyboardModalShell
     isOpen={isOpen}
+    viewportMode="overlay"
     aria-labelledby="modal-title"
     className="z-50 flex flex-col bg-white"
   >
@@ -127,15 +137,21 @@ User taps button
   → flushSync opens modal (input exists in DOM)
   → focusInput() runs in same click handler
   → if iOS blocks keyboard, focusWithIosKeyboard() uses anchor-input trick
-  → KeyboardModalShell pins to visual viewport (top, left, width, height)
+  → KeyboardModalShell applies viewport mode (fit or overlay)
   → scroll lock stops Safari from panning the page
 ```
+
+### Viewport modes
+
+**`fit` (default)** — Tracks `visualViewport` size and offset so the modal shrinks with the keyboard. The footer stays visible above the keyboard. Good for simple forms.
+
+**`overlay`** — Keeps the modal at full layout height (`100dvh`). The keyboard overlays the bottom of the modal; the footer does not move. Good for forms with custom dropdowns that need space below inputs. Pair with `interactiveWidget: "overlays-content"` in your viewport meta.
 
 ### Why iOS is different
 
 Safari only opens the virtual keyboard when `focus()` runs **inside the original tap/click handler**. Deferred focus (`setTimeout`, `useEffect`, `await`) often focuses the input without showing the keyboard.
 
-When the keyboard opens, iOS shrinks the **visual viewport** and may pan the page. A modal using only `position: fixed; top: 0; height: 100vh` will jump. This package tracks `visualViewport.offsetTop` and `visualViewport.height` to keep the modal pinned to the visible screen area.
+When the keyboard opens, iOS shrinks the **visual viewport** and may pan the page. A modal using only `position: fixed; top: 0; height: 100vh` can jump. In `fit` mode, this package tracks `visualViewport.offsetTop` and `visualViewport.height` to keep the modal pinned to the visible screen area. In `overlay` mode, the modal stays on the layout viewport and the keyboard covers the bottom.
 
 ---
 
@@ -149,14 +165,16 @@ When the keyboard opens, iOS shrinks the **visual viewport** and may pan the pag
 | `refocusInputInModal(ref, options?)` | Refocus after form clear (use in button handler) |
 | `focusInput(ref, options?)` | Focus with `preventScroll`; returns success boolean |
 | `focusWithIosKeyboard(ref, options?)` | Anchor-input fallback for stubborn iOS cases |
-| `getKeyboardModalShellStyle()` | Inline styles object for custom modal markup |
+| `getKeyboardModalShellStyle({ viewportMode? })` | Inline styles for custom modal markup |
+| `keyboardModalShellStyle` | Fit-mode style object (visual viewport) |
+| `keyboardModalShellOverlayStyle` | Overlay-mode style object (layout viewport) |
 
 ### Hooks
 
 | Export | Purpose |
 |--------|---------|
-| `useKeyboardModal(isOpen)` | All-in-one: viewport tracking, scroll lock, body overflow hidden |
-| `useVisualViewport()` | Tracks viewport metrics + sets CSS variables on `<html>` |
+| `useKeyboardModal(isOpen, { viewportMode? })` | Viewport tracking (fit only), scroll lock, body overflow hidden |
+| `useVisualViewport({ enabled? })` | Tracks viewport metrics + sets CSS variables on `<html>` |
 | `useVisualViewportScrollLock(enabled)` | Prevents Safari page pan when keyboard opens |
 | `useVisualViewportHeight()` | Returns viewport height only |
 | `useIosInputFocus({ inputRef, enabled })` | Returns `refocus` and `refocusWithFallback` helpers |
@@ -165,9 +183,9 @@ When the keyboard opens, iOS shrinks the **visual viewport** and may pan the pag
 
 | Export | Purpose |
 |--------|---------|
-| `KeyboardModalShell` | Pre-wired modal container pinned to visual viewport |
+| `KeyboardModalShell` | Modal container with `viewportMode`: `"fit"` or `"overlay"` |
 
-### CSS variables (set automatically)
+### CSS variables (set automatically in `fit` mode)
 
 | Variable | Meaning |
 |----------|---------|
@@ -175,6 +193,12 @@ When the keyboard opens, iOS shrinks the **visual viewport** and may pan the pag
 | `--visual-viewport-width` | Visible area width |
 | `--visual-viewport-offset-top` | Top offset when iOS pans |
 | `--visual-viewport-offset-left` | Left offset |
+
+### Types
+
+| Export | Meaning |
+|--------|---------|
+| `KeyboardModalViewportMode` | `"fit"` \| `"overlay"` |
 
 ---
 
@@ -189,7 +213,7 @@ import {
   KeyboardModalShell,
   openModalWithInputFocus,
   refocusInputInModal,
-} from "@jesse-schnupp/ios-keyboard-focus"
+} from "@nullcheck/ios-keyboard-focus"
 
 export const ItemForm = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -219,6 +243,7 @@ export const ItemForm = () => {
 
       <KeyboardModalShell
         isOpen={isOpen}
+        viewportMode="overlay"
         aria-labelledby="add-item-title"
         className="z-50 flex flex-col bg-white"
       >
@@ -265,7 +290,7 @@ Add the package to `transpilePackages` if you install from source/workspace:
 ```ts
 // next.config.ts
 const nextConfig = {
-  transpilePackages: ["@jesse-schnupp/ios-keyboard-focus"],
+  transpilePackages: ["@nullcheck/ios-keyboard-focus"],
 }
 
 export default nextConfig
@@ -281,7 +306,7 @@ npm run build
 npm publish --access public
 ```
 
-Scoped package name: `@jesse-schnupp/ios-keyboard-focus`
+Scoped package name: `@nullcheck/ios-keyboard-focus`
 
 ---
 

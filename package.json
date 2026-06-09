@@ -8,12 +8,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run build:package && next build",
-    "build:package": "npm run build -w @jesse-schnupp/ios-keyboard-focus",
+    "build:package": "npm run build -w @nullcheck/ios-keyboard-focus",
+    "publish:package": "npm publish -w @nullcheck/ios-keyboard-focus",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "@jesse-schnupp/ios-keyboard-focus": "workspace:*",
+    "@nullcheck/ios-keyboard-focus": "workspace:*",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"

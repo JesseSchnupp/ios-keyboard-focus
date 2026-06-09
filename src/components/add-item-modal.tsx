@@ -47,20 +47,6 @@ export const AddItemModal = ({
     scrollContainerRef.current?.scrollTo({ top: 0 })
   }, [isOpen])
 
-  const handleInputFocus = () => {
-    if (userScrolledRef.current) {
-      return
-    }
-
-    const scrollContainer = scrollContainerRef.current
-
-    if (!scrollContainer || scrollContainer.scrollTop === 0) {
-      return
-    }
-
-    scrollContainer.scrollTop = 0
-  }
-
   const handleScrollContainerScroll = () => {
     userScrolledRef.current = true
   }
@@ -123,6 +109,7 @@ export const AddItemModal = ({
   return (
     <KeyboardModalShell
       isOpen={isOpen}
+      viewportMode="overlay"
       aria-labelledby="add-item-modal-title"
       className="z-50 flex flex-col bg-background"
     >
@@ -166,7 +153,6 @@ export const AddItemModal = ({
               inputMode="text"
               value={formState.name}
               onChange={(event) => handleNameChange(event.target.value)}
-              onFocus={handleInputFocus}
               autoComplete="off"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
               aria-label="Item name"
@@ -188,7 +174,6 @@ export const AddItemModal = ({
                   email: event.target.value,
                 }))
               }
-              onFocus={handleInputFocus}
               autoComplete="email"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
               aria-label="Item email"
@@ -210,7 +195,6 @@ export const AddItemModal = ({
                   quantity: event.target.value,
                 }))
               }
-              onFocus={handleInputFocus}
               autoComplete="off"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
               aria-label="Item quantity"

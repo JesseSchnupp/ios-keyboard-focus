@@ -1,13 +1,16 @@
 {
-  "name": "@jesse-schnupp/ios-keyboard-focus",
+  "name": "@nullcheck/ios-keyboard-focus",
   "version": "0.1.0",
   "description": "Reliable mobile keyboard focus for iOS and Android modals in React",
   "license": "MIT",
   "author": "Jesse Schnupp",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JesseSchnupp/ios-keyboard-focus.git",
+    "url": "git+https://github.com/JesseSchnupp/ios-keyboard-focus.git",
     "directory": "packages/ios-keyboard-focus"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "homepage": "https://github.com/JesseSchnupp/ios-keyboard-focus#readme",
   "bugs": {

@@ -7,8 +7,10 @@ export { useKeyboardModal } from "./use-keyboard-modal"
 export { KeyboardModalShell } from "./keyboard-modal-shell"
 export {
   getKeyboardModalShellStyle,
+  keyboardModalShellOverlayStyle,
   keyboardModalShellStyle,
 } from "./keyboard-modal-styles"
+export type { KeyboardModalViewportMode } from "./keyboard-modal-styles"
 export {
   openModalWithInputFocus,
   refocusInputInModal,

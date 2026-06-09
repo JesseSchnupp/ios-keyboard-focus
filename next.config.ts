@@ -1,7 +1,7 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@jesse-schnupp/ios-keyboard-focus"],
+  transpilePackages: ["@nullcheck/ios-keyboard-focus"],
 }
 
 export default nextConfig
