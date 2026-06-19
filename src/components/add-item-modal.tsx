@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, type RefObject } from "react"
+import { useState, type RefObject } from "react"
 import { flushSync } from "react-dom"
 import {
   KeyboardModalShell,
@@ -35,21 +35,6 @@ export const AddItemModal = ({
 }: AddItemModalProps) => {
   const [formState, setFormState] = useState<FormState>(emptyFormState)
   const [error, setError] = useState<string | null>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const userScrolledRef = useRef(false)
-
-  useEffect(() => {
-    if (!isOpen) {
-      userScrolledRef.current = false
-      return
-    }
-
-    scrollContainerRef.current?.scrollTo({ top: 0 })
-  }, [isOpen])
-
-  const handleScrollContainerScroll = () => {
-    userScrolledRef.current = true
-  }
 
   const clearForm = () => {
     setFormState(emptyFormState())
@@ -94,8 +79,6 @@ export const AddItemModal = ({
       clearForm()
     })
 
-    userScrolledRef.current = false
-    scrollContainerRef.current?.scrollTo({ top: 0 })
     refocusInputInModal(nameInputRef, { selectOnFocus: true })
   }
 
@@ -130,12 +113,7 @@ export const AddItemModal = ({
         </button>
       </header>
 
-      <div
-        ref={scrollContainerRef}
-        data-modal-scroll
-        onScroll={handleScrollContainerScroll}
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4 py-4"
-      >
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4 py-4">
         <form
           className="flex flex-1 flex-col gap-4"
           onSubmit={(event) => {
