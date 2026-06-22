@@ -8,16 +8,20 @@ import {
 } from "@/lib/ios-keyboard-focus"
 import type { MockItemInput } from "@/lib/mock-items-store"
 
+const SCROLL_TEST_FIELD_COUNT = 30
+
 type FormState = {
   name: string
   email: string
   quantity: string
+  scrollTestFields: string[]
 }
 
 const emptyFormState = (): FormState => ({
   name: "",
   email: "",
   quantity: "",
+  scrollTestFields: Array.from({ length: SCROLL_TEST_FIELD_COUNT }, () => ""),
 })
 
 type AddItemModalProps = {
@@ -87,6 +91,15 @@ export const AddItemModal = ({
     if (error) {
       setError(null)
     }
+  }
+
+  const handleScrollTestFieldChange = (index: number, value: string) => {
+    setFormState((current) => ({
+      ...current,
+      scrollTestFields: current.scrollTestFields.map((fieldValue, fieldIndex) =>
+        fieldIndex === index ? value : fieldValue,
+      ),
+    }))
   }
 
   return (
@@ -178,6 +191,31 @@ export const AddItemModal = ({
               aria-label="Item quantity"
             />
           </label>
+
+          <div className="flex flex-col gap-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              Scroll test fields
+            </p>
+            {formState.scrollTestFields.map((value, index) => (
+              <label key={`scroll-test-field-${index + 1}`} className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                  Test field {index + 1}
+                </span>
+                <input
+                  type="text"
+                  inputMode="text"
+                  value={value}
+                  onChange={(event) =>
+                    handleScrollTestFieldChange(index, event.target.value)
+                  }
+                  autoComplete="off"
+                  placeholder={`Enter value for test field ${index + 1}`}
+                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base text-zinc-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                  aria-label={`Scroll test field ${index + 1}`}
+                />
+              </label>
+            ))}
+          </div>
 
           {error ? (
             <p className="text-sm text-red-600" role="alert">
