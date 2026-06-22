@@ -1,5 +1,6 @@
 import type { RefObject } from "react"
 import type { FocusableElement, FocusWithIosKeyboardOptions } from "./types"
+import { scheduleScrollFocusedInputIntoView } from "./scroll-focused-input-into-view"
 
 const createAnchorInput = () => {
   const anchor = document.createElement("input")
@@ -27,12 +28,17 @@ const createAnchorInput = () => {
 
 const focusElement = (
   element: FocusableElement,
-  selectOnFocus: boolean
+  selectOnFocus: boolean,
+  scrollIntoView: boolean
 ) => {
   element.focus({ preventScroll: true })
 
   if (selectOnFocus && "select" in element) {
     element.select()
+  }
+
+  if (scrollIntoView) {
+    scheduleScrollFocusedInputIntoView(element)
   }
 }
 
@@ -40,7 +46,7 @@ export const focusWithIosKeyboard = (
   targetRef: RefObject<FocusableElement | null>,
   options: FocusWithIosKeyboardOptions = {}
 ) => {
-  const { delayMs = 0, selectOnFocus = false } = options
+  const { delayMs = 0, selectOnFocus = false, scrollIntoView = true } = options
   const target = targetRef.current
 
   if (!target) {
@@ -57,7 +63,7 @@ export const focusWithIosKeyboard = (
       return
     }
 
-    focusElement(targetRef.current, selectOnFocus)
+    focusElement(targetRef.current, selectOnFocus, scrollIntoView)
     anchor.remove()
   }
 
@@ -73,14 +79,14 @@ export const focusInput = (
   targetRef: RefObject<FocusableElement | null>,
   options: FocusWithIosKeyboardOptions = {}
 ) => {
-  const { selectOnFocus = false } = options
+  const { selectOnFocus = false, scrollIntoView = true } = options
   const target = targetRef.current
 
   if (!target) {
     return false
   }
 
-  focusElement(target, selectOnFocus)
+  focusElement(target, selectOnFocus, scrollIntoView)
 
   if (document.activeElement === target) {
     return true

@@ -83,7 +83,10 @@ export const AddItemModal = ({
       clearForm()
     })
 
-    refocusInputInModal(nameInputRef, { selectOnFocus: true })
+    refocusInputInModal(nameInputRef, {
+      selectOnFocus: true,
+      scrollIntoView: false,
+    })
   }
 
   const handleNameChange = (value: string) => {
@@ -142,6 +145,7 @@ export const AddItemModal = ({
               ref={nameInputRef}
               type="text"
               inputMode="text"
+              data-keyboard-scroll-into-view="false"
               value={formState.name}
               onChange={(event) => handleNameChange(event.target.value)}
               autoComplete="off"

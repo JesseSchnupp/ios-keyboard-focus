@@ -14,6 +14,7 @@ export default function Home() {
   const handleOpenModal = () => {
     openModalWithInputFocus(() => setIsModalOpen(true), nameInputRef, {
       selectOnFocus: true,
+      scrollIntoView: false,
     })
   }
 
