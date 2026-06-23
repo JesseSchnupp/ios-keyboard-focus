@@ -1,6 +1,6 @@
 {
   "name": "@nullcheck/ios-keyboard-focus",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Reliable mobile keyboard focus for iOS and Android modals in React",
   "license": "MIT",
   "author": "Jesse Schnupp",

@@ -130,80 +130,6 @@ That is the minimum setup for stable layout + keyboard open on iOS.
 
 ---
 
-## Scroll focused inputs into view
-
-By default, focused inputs scroll into the visible area above the keyboard. This works inside modals (`KeyboardModalShell` enables it automatically) and on regular pages (attach the hook to your scroll container).
-
-### Modal (automatic)
-
-`KeyboardModalShell` listens for focus inside the modal and scrolls inputs into view when the keyboard opens. Disable globally with:
-
-```tsx
-<KeyboardModalShell isOpen={isOpen} scrollIntoView={false}>
-  ...
-</KeyboardModalShell>
-```
-
-### Regular pages
-
-Attach the hook to any scrollable container:
-
-```tsx
-"use client"
-
-import { useRef } from "react"
-import { useScrollFocusedInputIntoView } from "@nullcheck/ios-keyboard-focus"
-
-export const LongForm = () => {
-  const formRef = useRef<HTMLFormElement>(null)
-
-  useScrollFocusedInputIntoView(formRef)
-
-  return (
-    <form ref={formRef} className="overflow-y-auto">
-      <input type="text" />
-      {/* more fields */}
-    </form>
-  )
-}
-```
-
-### Opt out for top inputs
-
-Skip scroll-into-view for inputs already visible at the top (e.g. the first field when opening a modal):
-
-**HTML attribute (recommended for user taps):**
-
-```tsx
-<input
-  data-keyboard-scroll-into-view="false"
-  type="text"
-/>
-```
-
-**Programmatic focus option:**
-
-```tsx
-openModalWithInputFocus(() => setIsOpen(true), nameInputRef, {
-  scrollIntoView: false,
-})
-
-refocusInputInModal(nameInputRef, { scrollIntoView: false })
-```
-
-Inputs that are already fully visible in the visual viewport are skipped automatically — you only need to opt out when you want to prevent scrolling even if the field would otherwise be adjusted.
-
-### Manual scroll
-
-```tsx
-import { scrollFocusedInputIntoView } from "@nullcheck/ios-keyboard-focus"
-
-inputRef.current?.focus({ preventScroll: true })
-scrollFocusedInputIntoView(inputRef.current)
-```
-
----
-
 ## How it works
 
 ```text
@@ -213,7 +139,6 @@ User taps button
   → if iOS blocks keyboard, focusWithIosKeyboard() uses anchor-input trick
   → KeyboardModalShell applies viewport mode (fit or overlay)
   → scroll lock stops Safari from panning the page
-  → focused inputs scroll into the visible area above the keyboard (by default)
 ```
 
 ### Viewport modes
@@ -240,10 +165,6 @@ When the keyboard opens, iOS shrinks the **visual viewport** and may pan the pag
 | `refocusInputInModal(ref, options?)` | Refocus after form clear (use in button handler) |
 | `focusInput(ref, options?)` | Focus with `preventScroll`; returns success boolean |
 | `focusWithIosKeyboard(ref, options?)` | Anchor-input fallback for stubborn iOS cases |
-| `scrollFocusedInputIntoView(element, options?)` | Scroll a focused input above the keyboard |
-| `scheduleScrollFocusedInputIntoView(element, options?)` | Scroll after keyboard/viewport updates |
-| `shouldScrollFocusedInputIntoView(element)` | Returns false when opt-out attribute is set |
-| `getKeyboardOverlap()` | Returns keyboard overlap height in pixels |
 | `getKeyboardModalShellStyle({ viewportMode? })` | Inline styles for custom modal markup |
 | `keyboardModalShellStyle` | Fit-mode style object (visual viewport) |
 | `keyboardModalShellOverlayStyle` | Overlay-mode style object (layout viewport) |
@@ -253,7 +174,6 @@ When the keyboard opens, iOS shrinks the **visual viewport** and may pan the pag
 | Export | Purpose |
 |--------|---------|
 | `useKeyboardModal(isOpen, { viewportMode? })` | Viewport tracking (fit only), scroll lock, body overflow hidden |
-| `useScrollFocusedInputIntoView(containerRef, { enabled?, padding?, force? })` | Scroll focused inputs inside a container |
 | `useVisualViewport({ enabled? })` | Tracks viewport metrics + sets CSS variables on `<html>` |
 | `useVisualViewportScrollLock(enabled)` | Prevents Safari page pan when keyboard opens |
 | `useVisualViewportHeight()` | Returns viewport height only |
@@ -263,7 +183,7 @@ When the keyboard opens, iOS shrinks the **visual viewport** and may pan the pag
 
 | Export | Purpose |
 |--------|---------|
-| `KeyboardModalShell` | Modal container with `viewportMode`: `"fit"` or `"overlay"`; `scrollIntoView` defaults to `true` |
+| `KeyboardModalShell` | Modal container with `viewportMode`: `"fit"` or `"overlay"` |
 
 ### CSS variables (set automatically in `fit` mode)
 
@@ -279,8 +199,6 @@ When the keyboard opens, iOS shrinks the **visual viewport** and may pan the pag
 | Export | Meaning |
 |--------|---------|
 | `KeyboardModalViewportMode` | `"fit"` \| `"overlay"` |
-| `ScrollFocusedInputIntoViewOptions` | `{ padding?: number; force?: boolean }` |
-| `KEYBOARD_SCROLL_INTO_VIEW_ATTR` | `"data-keyboard-scroll-into-view"` — set to `"false"` to opt out |
 
 ---
 
@@ -395,7 +313,6 @@ Scoped package name: `@nullcheck/ios-keyboard-focus`
 ## Known iOS limitations
 
 - The keyboard **overlays** content; it does not always resize the layout viewport
-- Scroll-into-view uses the visual viewport and inner scroll containers; very bottom fields may need enough scroll room in the container
 - `focus()` after `await` breaks the user-gesture chain — refocus in the same click handler
 - Do not use `maximum-scale=1` or `user-scalable=no` — accessibility violation
 - Do not use `position: fixed` on `body` — can freeze modals when keyboard toggles
